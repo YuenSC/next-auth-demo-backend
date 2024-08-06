@@ -1,11 +1,9 @@
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
+    "id" TEXT NOT NULL PRIMARY KEY,
     "email" TEXT NOT NULL,
     "name" TEXT,
-    "password" TEXT,
-
-    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+    "password" TEXT
 );
 
 -- CreateIndex

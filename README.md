@@ -23,38 +23,20 @@ npm install prisma --save-dev
 npx prisma init
 ```
 
-### 1.2 Install Docker Compose and Run the Database Locally
+Update the In [`schema.prisma`](prisma\schema.prisma) to use SQLite:
 
-Create a [`docker-compose.yml`](./docker-compose.yml) file with the following content:
-
-```yaml
-services:
-  postgres:
-    image: postgres
-    restart: always
-    ports:
-      - 5432:5432
-    volumes:
-      - ~/apps/postgres:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=next-auth-demo-backend
-      - POSTGRES_PASSWORD=example
-      - POSTGRES_USER=root
+```prisma
+datasource db {
+  provider = "sqlite"
+  url      =  env("DATABASE_URL")
+}
 ```
 
-Then open Docker Desktop and run the following command:
-
-```sh
-docker-compose up -d
+```
+DATABASE_URL=file:./dev.db
 ```
 
-Update the DATABASE_URL in the [`.env`](.env) file with the correct format:
-
-```
-DATABASE_URL=postgresql://root:example@localhost:5432/next-auth-demo-backend?schema=public
-```
-
-### 1.3 Create a User Model
+### 1.2 Create a User Model
 
 In [`schema.prisma`](prisma\schema.prisma):
 
@@ -67,7 +49,13 @@ model User {
 }
 ```
 
-### 1.5 Follow the [NestJS Prisma Recipe](https://docs.nestjs.com/recipes/prisma)
+### 1.3 Run Prisma Migrate
+
+```sh
+npx prisma migrate dev --name init
+```
+
+### 1.4 Follow the [NestJS Prisma Recipe](https://docs.nestjs.com/recipes/prisma)
 
 The rest are sample, following the docs should be enough to generate the CRUD operations.
 

@@ -55,10 +55,24 @@ model User {
 npx prisma migrate dev --name init
 ```
 
-### 1.4 Follow the [NestJS Prisma Recipe](https://docs.nestjs.com/recipes/prisma)
+## Step 2: Follow the [NestJS Prisma Recipe](https://docs.nestjs.com/recipes/prisma)
 
 The rest are sample, following the docs should be enough to generate the CRUD operations.
 
 - Install and generate Prisma Client
 - Use Prisma Client in your NestJS services - Create PrismaService
 - Run nest g resource user for CRUD operations - Update the service to use PrismaService
+
+## Step 3: Add authentication and authorization using Passport for credential login, Google login, and Apple login
+
+Ref: https://docs.nestjs.com/recipes/passport
+
+### 3.1 Install Passport and Passport Strategies
+
+```sh
+npm install @nestjs/passport passport passport-local passport-jwt
+npm install @nestjs/jwt passport-jwt
+npm install passport-google-oauth20
+npm install passport-apple
+npm install -D @types/passport-local @types/passport-google-oauth20 @types/passport-apple
+```

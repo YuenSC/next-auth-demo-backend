@@ -1,16 +1,19 @@
 import {
-  ExceptionFilter,
-  Catch,
   ArgumentsHost,
+  Catch,
+  ExceptionFilter,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
 import { Prisma } from '@prisma/client';
+import { Request, Response } from 'express';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
+  private readonly logger = new Logger(AllExceptionsFilter.name);
+
+  catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
@@ -19,7 +22,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    let message = (exception as any).message || 'Internal server error';
+    let message =
+      (Array.isArray(exception.response?.message)
+        ? exception.response.message.join(', ')
+        : exception.response?.message) || 'Internal server error';
 
     if (exception instanceof Prisma.PrismaClientKnownRequestError) {
       // Handle Prisma errors

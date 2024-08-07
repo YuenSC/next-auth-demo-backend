@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -12,12 +12,24 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const { password, ...data } = createUserDto;
-    const hashedPassword = await this.authService.hashPassword(password);
+    if (createUserDto.password) {
+      createUserDto.password = await this.authService.hashPassword(
+        createUserDto.password,
+      );
+    }
 
-    return this.prisma.user.create({
-      data: { ...data, password: hashedPassword },
-    });
+    return this.prisma.user
+      .create({
+        data: createUserDto,
+      })
+      .catch((error) => {
+        if (error.code === 'P2002') {
+          throw new BadRequestException(
+            'Account with the same email already exists.',
+          );
+        }
+        throw error;
+      });
   }
 
   findAll() {

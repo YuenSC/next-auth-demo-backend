@@ -13,6 +13,12 @@ export enum UserRole {
   ADMIN = 'ADMIN',
 }
 
+export enum UserProvider {
+  email = 'EMAIL',
+  google = 'GOOGLE',
+  apple = 'APPLE',
+}
+
 export class CreateUserDto implements Prisma.UserCreateInput {
   @IsEmail()
   email: string;
@@ -35,4 +41,8 @@ export class CreateUserDto implements Prisma.UserCreateInput {
   @IsOptional()
   @IsEnum(UserRole)
   role?: UserRole;
+
+  @IsOptional()
+  @IsEnum(UserProvider)
+  provider?: UserProvider;
 }

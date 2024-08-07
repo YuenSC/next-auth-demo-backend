@@ -1,9 +1,21 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { OAuth2Client } from 'google-auth-library';
 import { PrismaService } from '../prisma/prisma.service';
+import {
+  CreateUserDto,
+  UserProvider,
+  UserRole,
+} from '../user/dto/create-user.dto';
 import { UserService } from '../user/user.service';
+import { GoogleLoginDto } from './dto/google-login.dto';
 
 @Injectable()
 export class AuthService {
@@ -34,5 +46,25 @@ export class AuthService {
       throw new Error('Invalid password.');
     }
     return this.userService.excludeUserFields(user, ['password']);
+  }
+
+  async googleLogin({ token }: GoogleLoginDto) {
+    const client = new OAuth2Client(process.env.AUTH_GOOGLE_CLIENT_ID);
+    try {
+      const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.AUTH_GOOGLE_CLIENT_ID,
+      });
+      const { email, name } = ticket.getPayload();
+
+      return {
+        email,
+        name,
+        role: UserRole.USER,
+        provider: UserProvider.google,
+      } as CreateUserDto;
+    } catch (error) {
+      throw new BadRequestException('Something wrong in google login.');
+    }
   }
 }

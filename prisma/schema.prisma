@@ -19,5 +19,6 @@ model User {
   email    String  @unique
   name     String?
   password String?
-  role     String  @default("USER")
+  role     String  @default("USER") // USER | ADMIN
+  provider String  @default("EMAIL") // EMAIL | GOOGLE | APPLE
 }

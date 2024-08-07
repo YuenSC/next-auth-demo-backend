@@ -1,11 +1,17 @@
 import { Prisma } from '@prisma/client';
 import {
   IsEmail,
+  IsEnum,
   IsOptional,
   IsString,
   IsStrongPassword,
   Length,
 } from 'class-validator';
+
+export enum UserRole {
+  USER = 'USER',
+  ADMIN = 'ADMIN',
+}
 
 export class CreateUserDto implements Prisma.UserCreateInput {
   @IsEmail()
@@ -25,4 +31,8 @@ export class CreateUserDto implements Prisma.UserCreateInput {
     minLowercase: 1,
   })
   password?: string;
+
+  @IsOptional()
+  @IsEnum(UserRole)
+  role?: UserRole;
 }

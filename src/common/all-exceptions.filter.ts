@@ -27,6 +27,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.response.message.join(', ')
         : exception.response?.message) || 'Internal server error';
 
+    this.logger.error(exception);
+
     if (exception instanceof Prisma.PrismaClientKnownRequestError) {
       // Handle Prisma errors
       if (exception.code === 'P2002') {

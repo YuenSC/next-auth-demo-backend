@@ -9,6 +9,36 @@ import {
 import { Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
 
+// Define an enum for Prisma error codes
+enum PrismaErrorCodes {
+  UniqueConstraintFailed = 'P2002',
+  RecordNotFound = 'P2025',
+}
+
+// Function to get the error message and status based on the exception
+function getPrismaErrorInfo(exception: Prisma.PrismaClientKnownRequestError): {
+  message: string;
+  status: HttpStatus;
+} {
+  switch (exception.code) {
+    case PrismaErrorCodes.UniqueConstraintFailed:
+      return {
+        message:
+          'Unique constraint failed on the field: ' + exception.meta.target,
+        status: HttpStatus.CONFLICT,
+      };
+    case PrismaErrorCodes.RecordNotFound:
+      return {
+        message: `${exception.meta.modelName ?? 'Record'} not found`,
+        status: HttpStatus.NOT_FOUND,
+      };
+    default:
+      return {
+        message: 'An unknown error occurred',
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+      };
+  }
+}
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
@@ -22,27 +52,22 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    let message =
+    const message =
       (Array.isArray(exception.response?.message)
         ? exception.response.message.join(', ')
         : exception.response?.message) || 'Internal server error';
 
-    this.logger.error(exception);
+    this.logger.error({ ...exception });
 
     if (exception instanceof Prisma.PrismaClientKnownRequestError) {
-      // Handle Prisma errors
-      if (exception.code === 'P2002') {
-        // Unique constraint failed
-        message =
-          'Unique constraint failed on the field: ' + exception.meta.target;
-        response.status(HttpStatus.CONFLICT).json({
-          statusCode: HttpStatus.CONFLICT,
-          timestamp: new Date().toISOString(),
-          path: request.url,
-          message,
-        });
-        return;
-      }
+      const { message, status } = getPrismaErrorInfo(exception);
+      response.status(status).json({
+        statusCode: status,
+        timestamp: new Date().toISOString(),
+        path: request.url,
+        message,
+      });
+      return;
     }
 
     response.status(status).json({

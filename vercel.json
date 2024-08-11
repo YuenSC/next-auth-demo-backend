@@ -14,5 +14,5 @@
     }
   ],
   "framework": null,
-  "buildCommand": "echo 'Hello, World!' && npm run build"
+  "buildCommand": "echo 'Hello, World!'"
 }

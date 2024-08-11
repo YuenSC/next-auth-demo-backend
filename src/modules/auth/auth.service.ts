@@ -34,7 +34,11 @@ export class AuthService {
     return this.jwtService.sign({ username: user.email, sub: user.id });
   }
 
-  async validateUser(email: string, password: string) {
+  async validateUser(
+    email: string,
+    password: string,
+    requiredProvider?: UserProvider,
+  ) {
     const user = await this.prisma.user.findUnique({
       where: { email },
       omit: { password: false },
@@ -42,6 +46,13 @@ export class AuthService {
     if (!user) {
       throw new Error('No user found with this email address.');
     }
+
+    if (requiredProvider && user.provider !== requiredProvider) {
+      throw new Error(
+        `Your email is not registered with ${requiredProvider}. Please login with another method.`,
+      );
+    }
+
     if (!(await bcrypt.compare(password, user.password))) {
       throw new Error('Invalid password.');
     }

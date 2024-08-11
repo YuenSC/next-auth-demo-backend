@@ -2,7 +2,7 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { AuthGuardLocal } from './auth-guard.local';
 import { AuthService } from './auth.service';
-import { CurrentUser } from './current-user.decorator';
+import { CurrentUser } from './decorators/current-user.decorator';
 import { SignUpDto } from './dto/sign-up.dto';
 import { GoogleLoginDto } from './dto/google-login.dto';
 import { PrismaService } from '../prisma/prisma.service';

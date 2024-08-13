@@ -16,7 +16,6 @@ export class RolesGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    console.log('RolesGuard');
     const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
       ROLES_KEY,
       [context.getHandler(), context.getClass()],
@@ -31,7 +30,9 @@ export class RolesGuard implements CanActivate {
       throw new BadRequestException('User not found');
     }
     if (!requiredRoles.some((role) => user.role === role)) {
-      throw new BadRequestException('User does not have the right role');
+      throw new BadRequestException(
+        `Your user does not have the required roles for this action.`,
+      );
     }
     return true;
   }

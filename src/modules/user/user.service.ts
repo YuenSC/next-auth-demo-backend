@@ -3,6 +3,7 @@ import { AuthService } from '../auth/auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ListQueryParams } from 'src/common/list-query.decorator';
 
 @Injectable()
 export class UserService {
@@ -32,8 +33,19 @@ export class UserService {
       });
   }
 
-  findAll() {
-    return this.prisma.user.findMany();
+  findAll({ offset, page, searchText }: ListQueryParams) {
+    return this.prisma.user.findMany({
+      skip: offset * (page - 1),
+      take: offset,
+      where: {
+        ...(searchText && {
+          OR: [
+            { email: { contains: searchText, mode: 'insensitive' } },
+            { name: { contains: searchText, mode: 'insensitive' } },
+          ],
+        }),
+      },
+    });
   }
 
   findOne(id: string) {

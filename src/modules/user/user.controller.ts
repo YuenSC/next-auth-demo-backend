@@ -15,6 +15,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateUserDto, UserProvider } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
+import { ListQuery, ListQueryParams } from 'src/common/list-query.decorator';
 
 @UseGuards(AuthGuardJwt, RolesGuard)
 @Roles(UserRole.ADMIN)
@@ -31,8 +32,8 @@ export class UserController {
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  findAll(@ListQuery() query: ListQueryParams) {
+    return this.userService.findAll(query);
   }
 
   @Get(':id')

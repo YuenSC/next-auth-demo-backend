@@ -9,6 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { ListQuery, ListQueryParams } from 'src/common/list-query.decorator';
 import { AuthGuardJwt } from '../auth/auth-guard.jwt';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -30,8 +31,8 @@ export class ProjectsController {
   }
 
   @Get()
-  findAll(@CurrentUser() user: User) {
-    return this.projectsService.findAll(user);
+  findAll(@CurrentUser() user: User, @ListQuery() query: ListQueryParams) {
+    return this.projectsService.findAll(user, query);
   }
 
   @Get(':id')

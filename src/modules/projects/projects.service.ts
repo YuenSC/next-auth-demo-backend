@@ -3,6 +3,7 @@ import { User } from '@prisma/client';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { ListQueryParams } from 'src/common/list-query.decorator';
 
 @Injectable()
 export class ProjectsService {
@@ -17,9 +18,19 @@ export class ProjectsService {
     });
   }
 
-  findAll(owner: User) {
+  findAll(owner: User, { searchText, offset, page }: ListQueryParams) {
     return this.prisma.project.findMany({
-      where: { ownerId: owner.id },
+      skip: offset * (page - 1),
+      take: offset,
+      where: {
+        ownerId: owner.id,
+        ...(searchText && {
+          name: {
+            contains: searchText,
+            mode: 'insensitive',
+          },
+        }),
+      },
       include: { owner: true },
     });
   }

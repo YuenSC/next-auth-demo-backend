@@ -20,6 +20,7 @@ export class ProjectsService {
   findAll(owner: User) {
     return this.prisma.project.findMany({
       where: { ownerId: owner.id },
+      include: { owner: true },
     });
   }
 

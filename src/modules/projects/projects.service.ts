@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { ListQueryParams } from 'src/common/list-query.decorator';
+import { generatePaginationResponse } from 'src/common/pagination.util';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
-import { PrismaService } from '../prisma/prisma.service';
-import { ListQueryParams } from 'src/common/list-query.decorator';
 
 @Injectable()
 export class ProjectsService {
@@ -18,10 +19,10 @@ export class ProjectsService {
     });
   }
 
-  findAll(owner: User, { searchText, offset, page }: ListQueryParams) {
-    return this.prisma.project.findMany({
-      skip: offset * (page - 1),
-      take: offset,
+  async findAll(owner: User, { searchText, page, limit }: ListQueryParams) {
+    const res = await this.prisma.project.findManyAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
       where: {
         ownerId: owner.id,
         ...(searchText && {
@@ -33,6 +34,10 @@ export class ProjectsService {
       },
       include: { owner: true },
     });
+
+    console.log('res', res);
+
+    return generatePaginationResponse(res, { page, limit });
   }
 
   findOne(id: string, owner: User) {

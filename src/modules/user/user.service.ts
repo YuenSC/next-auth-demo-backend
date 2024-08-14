@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ListQueryParams } from 'src/common/list-query.decorator';
+import { generatePaginationResponse } from 'src/common/pagination.util';
 
 @Injectable()
 export class UserService {
@@ -33,10 +34,10 @@ export class UserService {
       });
   }
 
-  findAll({ offset, page, searchText }: ListQueryParams) {
-    return this.prisma.user.findMany({
-      skip: offset * (page - 1),
-      take: offset,
+  async findAll({ page, limit, searchText }: ListQueryParams) {
+    const res = await this.prisma.user.findManyAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
       where: {
         ...(searchText && {
           OR: [
@@ -46,6 +47,8 @@ export class UserService {
         }),
       },
     });
+
+    return generatePaginationResponse(res, { page, limit });
   }
 
   findOne(id: string) {

@@ -10,6 +10,7 @@ import { PrismaModule } from './modules/prisma/prisma.module';
 import { UserModule } from './modules/user/user.module';
 import { TransformInterceptor } from './transform.interceptor';
 import { ProjectsModule } from './modules/projects/projects.module';
+import { TimeEntryModule } from './modules/time-entry/time-entry.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ProjectsModule } from './modules/projects/projects.module';
       envFilePath: envFilePath,
     }),
     ProjectsModule,
+    TimeEntryModule,
   ],
   controllers: [AppController],
   providers: [

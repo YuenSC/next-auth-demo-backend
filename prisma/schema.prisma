@@ -37,7 +37,7 @@ model Project {
 
 model TimeEntry {
   id        String    @id @default(uuid())
-  name      String
+  name      String?
   startTime DateTime
   endTime   DateTime?
   user      User      @relation(fields: [userId], references: [id])

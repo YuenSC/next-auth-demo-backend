@@ -40,6 +40,14 @@ export class TimeEntryController {
     return this.timeEntryService.findAll(query, user.id, projectId);
   }
 
+  @Get('current')
+  findCurrentTimeEntry(
+    @CurrentUser() user: User,
+    @Param('projectId') projectId: string,
+  ) {
+    return this.timeEntryService.findCurrentTimeEntry(user.id, projectId);
+  }
+
   @Get(':id')
   findOne(
     @Param('id') id: string,

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateTimeEntryDto } from './dto/create-time-entry.dto';
 import { UpdateTimeEntryDto } from './dto/update-time-entry.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -10,6 +10,13 @@ export class TimeEntryService {
   constructor(private readonly prisma: PrismaService) {}
 
   create({ projectId, userId, ...createTimeEntryDto }: CreateTimeEntryDto) {
+    const currentTimeEntry = this.findCurrentTimeEntry(userId, projectId);
+    if (currentTimeEntry) {
+      throw new BadRequestException(
+        'User already has a time entry for this project. Please stop the current time entry before starting a new one.',
+      );
+    }
+
     return this.prisma.timeEntry.create({
       data: {
         ...createTimeEntryDto,
@@ -40,6 +47,12 @@ export class TimeEntryService {
   findOne(id: string, userId: string, projectId: string) {
     return this.prisma.timeEntry.findFirst({
       where: { id, userId, projectId },
+    });
+  }
+
+  findCurrentTimeEntry(userId: string, projectId: string) {
+    return this.prisma.timeEntry.findFirst({
+      where: { userId, projectId, endTime: null },
     });
   }
 

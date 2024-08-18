@@ -10,7 +10,7 @@ export class TimeEntryService {
   constructor(private readonly prisma: PrismaService) {}
 
   create({ projectId, userId, ...createTimeEntryDto }: CreateTimeEntryDto) {
-    const currentTimeEntry = this.findCurrentTimeEntry(userId, projectId);
+    const currentTimeEntry = this.findCurrentTimeEntry(userId);
     if (currentTimeEntry) {
       throw new BadRequestException(
         'User already has a time entry for this project. Please stop the current time entry before starting a new one.',
@@ -30,45 +30,38 @@ export class TimeEntryService {
     });
   }
 
-  async findAll(
-    { page, limit }: ListQueryParams,
-    userId: string,
-    projectId: string,
-  ) {
+  async findAll({ page, limit }: ListQueryParams, userId: string) {
     const res = await this.prisma.timeEntry.findManyAndCount({
       skip: (page - 1) * limit,
       take: limit,
-      where: { userId, projectId },
+      where: { userId },
     });
 
     return generatePaginationResponse(res, { page, limit });
   }
 
-  findOne(id: string, userId: string, projectId: string) {
+  findOne(id: string, userId: string) {
     return this.prisma.timeEntry.findFirst({
-      where: { id, userId, projectId },
+      where: { id, userId },
     });
   }
 
-  findCurrentTimeEntry(userId: string, projectId: string) {
+  findCurrentTimeEntry(userId: string) {
     return this.prisma.timeEntry.findFirst({
-      where: { userId, projectId, endTime: null },
+      where: { userId, endTime: null },
     });
   }
 
-  update(
-    id: string,
-    { userId, projectId, ...updateTimeEntryDto }: UpdateTimeEntryDto,
-  ) {
+  update(id: string, { userId, ...updateTimeEntryDto }: UpdateTimeEntryDto) {
     return this.prisma.timeEntry.update({
-      where: { id, userId, projectId },
+      where: { id, userId },
       data: updateTimeEntryDto,
     });
   }
 
-  remove(id: string, userId: string, projectId: string) {
+  remove(id: string, userId: string) {
     return this.prisma.timeEntry.delete({
-      where: { id, userId, projectId },
+      where: { id, userId },
     });
   }
 }

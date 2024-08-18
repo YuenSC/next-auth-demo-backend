@@ -9,8 +9,12 @@ import { generatePaginationResponse } from 'src/common/pagination.util';
 export class TimeEntryService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create({ projectId, userId, ...createTimeEntryDto }: CreateTimeEntryDto) {
-    const currentTimeEntry = this.findCurrentTimeEntry(userId);
+  async create({
+    projectId,
+    userId,
+    ...createTimeEntryDto
+  }: CreateTimeEntryDto) {
+    const currentTimeEntry = await this.findCurrentTimeEntry(userId);
     if (currentTimeEntry) {
       throw new BadRequestException(
         'User already has a time entry for this project. Please stop the current time entry before starting a new one.',
@@ -35,6 +39,7 @@ export class TimeEntryService {
       skip: (page - 1) * limit,
       take: limit,
       where: { userId },
+      orderBy: { startTime: 'desc' },
     });
 
     return generatePaginationResponse(res, { page, limit });

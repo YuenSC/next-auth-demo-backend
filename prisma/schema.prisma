@@ -42,8 +42,8 @@ model TimeEntry {
   endTime   DateTime?
   user      User      @relation(fields: [userId], references: [id])
   userId    String
-  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId String
+  project   Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String?
 }
 
 enum UserRole {

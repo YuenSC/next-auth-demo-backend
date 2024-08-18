@@ -3,6 +3,8 @@ import { AuthService } from '../auth/auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ListQueryParams } from 'src/common/list-query.decorator';
+import { generatePaginationResponse } from 'src/common/pagination.util';
 
 @Injectable()
 export class UserService {
@@ -32,8 +34,21 @@ export class UserService {
       });
   }
 
-  findAll() {
-    return this.prisma.user.findMany();
+  async findAll({ page, limit, searchText }: ListQueryParams) {
+    const res = await this.prisma.user.findManyAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+      where: {
+        ...(searchText && {
+          OR: [
+            { email: { contains: searchText, mode: 'insensitive' } },
+            { name: { contains: searchText, mode: 'insensitive' } },
+          ],
+        }),
+      },
+    });
+
+    return generatePaginationResponse(res, { page, limit });
   }
 
   findOne(id: string) {

@@ -15,13 +15,14 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateUserDto, UserProvider } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
+import { ListQuery, ListQueryParams } from 'src/common/list-query.decorator';
 
 @UseGuards(AuthGuardJwt, RolesGuard)
+@Roles(UserRole.ADMIN)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Roles(UserRole.ADMIN)
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create({
@@ -31,8 +32,8 @@ export class UserController {
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  findAll(@ListQuery() query: ListQueryParams) {
+    return this.userService.findAll(query);
   }
 
   @Get(':id')
@@ -40,13 +41,11 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
-  @Roles(UserRole.ADMIN)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
   }
 
-  @Roles(UserRole.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(id);

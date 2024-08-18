@@ -15,12 +15,35 @@ datasource db {
 }
 
 model User {
-  id       String       @id @default(uuid())
-  email    String       @unique
-  name     String?
-  password String?
-  role     UserRole     @default(USER)
-  provider AuthProvider @default(EMAIL)
+  id        String       @id @default(uuid())
+  email     String       @unique
+  name      String?
+  password  String?
+  role      UserRole     @default(USER)
+  provider  AuthProvider @default(EMAIL)
+  TimeEntry TimeEntry[]
+  Project   Project[]
+}
+
+model Project {
+  id          String      @id @default(uuid())
+  name        String
+  description String?
+  clientName  String? // this can be a new model, but for simplicity, I'm keeping it as a string
+  owner       User        @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     String
+  timeEntries TimeEntry[]
+}
+
+model TimeEntry {
+  id        String    @id @default(uuid())
+  name      String
+  startTime DateTime
+  endTime   DateTime?
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId String
 }
 
 enum UserRole {

@@ -9,6 +9,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { UserModule } from './modules/user/user.module';
 import { TransformInterceptor } from './transform.interceptor';
+import { ProjectsModule } from './modules/projects/projects.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { TransformInterceptor } from './transform.interceptor';
       load: [authJwtConfig],
       envFilePath: envFilePath,
     }),
+    ProjectsModule,
   ],
   controllers: [AppController],
   providers: [

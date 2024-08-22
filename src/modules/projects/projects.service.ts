@@ -35,8 +35,6 @@ export class ProjectsService {
       include: { owner: true },
     });
 
-    console.log('res', res);
-
     return generatePaginationResponse(res, { page, limit });
   }
 

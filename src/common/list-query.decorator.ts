@@ -11,9 +11,13 @@ export interface ListQueryParams {
 }
 
 export const ListQuery = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext): ListQueryParams => {
+  (data: { defaultLimit?: number }, ctx: ExecutionContext): ListQueryParams => {
     const request = ctx.switchToHttp().getRequest();
-    const { searchText, limit = 10, page = 1 } = request.query;
+    const {
+      searchText,
+      limit = data?.defaultLimit ?? 10,
+      page = 1,
+    } = request.query;
     if (page <= 0) {
       throw new BadRequestException('Page must be greater than or equal to 1');
     }

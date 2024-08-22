@@ -11,11 +11,11 @@ export interface ListQueryParams {
 }
 
 export const ListQuery = createParamDecorator(
-  (data: { defaultLimit: number }, ctx: ExecutionContext): ListQueryParams => {
+  (data: { defaultLimit?: number }, ctx: ExecutionContext): ListQueryParams => {
     const request = ctx.switchToHttp().getRequest();
     const {
       searchText,
-      limit = data.defaultLimit ?? 10,
+      limit = data?.defaultLimit ?? 10,
       page = 1,
     } = request.query;
     if (page <= 0) {

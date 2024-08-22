@@ -38,7 +38,7 @@ export class TimeEntryService {
     const res = await this.prisma.timeEntry.findManyAndCount({
       skip: (page - 1) * limit,
       take: limit,
-      where: { userId },
+      where: { userId, endTime: { not: null } },
       orderBy: { startTime: 'desc' },
     });
 
@@ -57,10 +57,19 @@ export class TimeEntryService {
     });
   }
 
-  update(id: string, { userId, ...updateTimeEntryDto }: UpdateTimeEntryDto) {
+  update(
+    id: string,
+    { userId, projectId, ...updateTimeEntryDto }: UpdateTimeEntryDto,
+  ) {
     return this.prisma.timeEntry.update({
       where: { id, userId },
-      data: updateTimeEntryDto,
+      data: {
+        ...updateTimeEntryDto,
+        ...(projectId === '' && { project: { disconnect: true } }),
+        ...(projectId && {
+          project: { connect: { id: projectId } },
+        }),
+      },
     });
   }
 

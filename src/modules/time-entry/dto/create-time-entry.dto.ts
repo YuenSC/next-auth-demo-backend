@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsISO8601, IsUUID } from 'class-validator';
+import { IsISO8601, IsOptional, IsString } from 'class-validator';
 
 export class CreateTimeEntryDto {
   @IsOptional()
@@ -14,7 +14,6 @@ export class CreateTimeEntryDto {
 
   @IsOptional()
   @IsString()
-  @IsUUID()
   projectId?: string;
 
   userId: string;
